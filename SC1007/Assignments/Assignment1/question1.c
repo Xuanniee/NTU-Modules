@@ -70,7 +70,32 @@ void deleteList(ListNode **ptrHead){
 // Need to add Input Validation
 ListNode *reverseSegment(ListNode* head, int start, int end)
 {
-    // Create 3 Node Pointers
+    // Input Validation
+	int LL_length = 0;
+	ListNode *length_counter = head;
+
+	while (length_counter != NULL)
+	{
+		LL_length += 1;
+		length_counter = length_counter->next;
+	}
+	if (start < 0)
+	{
+		// Quit the Function without changing anything
+		return head;
+	}
+	else if (end > (LL_length - 1))
+	{
+		// Quit the Function without changing anything
+		return head;
+	}
+    else if (start > end)
+    {
+        // Illegal
+        return head;
+    }
+
+    // Create Node Pointers
     ListNode *prev_node = NULL, *before_start = NULL, *after_end = NULL, *reversed_list_head = NULL, *reversed_list_tail = NULL, *next_node = NULL;
     ListNode *curr_node = head;
 
@@ -78,6 +103,7 @@ ListNode *reverseSegment(ListNode* head, int start, int end)
     int current_node_num = 0;
     while (current_node_num != start)
     {
+        // Save the Node before Start Node
         if (current_node_num == (start - 1))
         {
             before_start = curr_node;
@@ -86,55 +112,47 @@ ListNode *reverseSegment(ListNode* head, int start, int end)
         curr_node = curr_node->next;
         current_node_num += 1;
     }
+    // Save the Tail Node after Reversing
     next_node = curr_node;
     reversed_list_tail = curr_node;
 
     // Start Reversing the Linked List
-    while (current_node_num != end)
+    while (current_node_num != (end+1))
     {
-        curr_node->next = prev_node;
-
-        // Move all 3 Pointers
-        prev_node = curr_node;
-        curr_node = curr_node->next;
-        if (next_node->next != NULL)
-        {
-            next_node = curr_node->next;
-        }
-        current_node_num += 1;
-
         // Save the Start of Reversed List and After End Node
         if (current_node_num == end)
         {
             reversed_list_head = curr_node;
             after_end = curr_node->next;
         }
+        // Save the Next Node before reversing
+        next_node = curr_node->next;
+
+        // Reverse the Node
+        curr_node->next = prev_node;
+
+        // Move the remaining Pointers
+        prev_node = curr_node;
+        curr_node = next_node;
+        
+        current_node_num += 1;
     }
 
     // Combine back into 1 Linked List
-    before_start->next = reversed_list_head;
-    reversed_list_tail->next = after_end;
-    
+    if (start != 0)
+    {
+        // Connect Middle Segment with Top and Bottom of LL
+        before_start->next = reversed_list_head;
+        reversed_list_tail->next = after_end;
+        return head;
+    }  
+    // Edge Case  
+    else
+    {
+        // Change where the Head Pointer is pointing at
+        head = reversed_list_head;
+        reversed_list_tail->next = after_end;
+        return head;
+    }
     return head;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

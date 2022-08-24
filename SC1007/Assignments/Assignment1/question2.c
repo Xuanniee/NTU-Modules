@@ -61,6 +61,9 @@ void deleteList(ListNode **ptrHead){
 
 void reverseKNodes(ListNode** head, int K)
 {
+	// Input Validation
+
+
     // Initialize a Dummy Node
 	ListNode *dummy = (ListNode*) malloc(sizeof(ListNode));
 	dummy->next = *head;
@@ -85,10 +88,6 @@ void reverseKNodes(ListNode** head, int K)
 		// Find the Last Node of a Segmented List
 		for (int i = 0; i < K; i += 1)
 		{
-			if (last_node->next != NULL)
-			{
-				
-			}
 			last_node = last_node->next;
 		}
 
@@ -113,11 +112,15 @@ void reverseKNodes(ListNode** head, int K)
 			first_node = next;
 		}
 
-		// Combine the Linked Lists
-		// Update the First Node of Segment to point at segment_next
+		// Combine the Segmented Linked List
 		(segment_prev->next)->next= segment_next;
 		segment_prev->next = last_node;
 
+		// Break Condition
+		if (last_node == NULL)
+		{
+			break;
+		}
 	}
 
 
