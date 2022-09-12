@@ -136,31 +136,6 @@ int duplicateReverse(ListNode *curr, ListNode **ptrNewHead)
         {
             next_node = next_node->next;
         }
-
-        // // Have the Middle Pointer point at the First Pointer
-        // middlePtr->next = reversePtr;
-
-        // // Make First Node Point at Null
-        // if (reversePtr == newCursor)
-        // {
-        //     reversePtr->next = NULL;
-        // }
-
-        // // Move all the Pointers forward by 1 Node
-        // reversePtr = middlePtr;
-        // middlePtr = forwardPtr;
-        // forwardPtr = forwardPtr->next;
-
-        // // Break Condition: Forward at Last Node
-        // if (forwardPtr->next == NULL)
-        // {
-        //     // // Have Forward Ptr Point at Second Last Node
-        //     // forwardPtr->next = middlePtr;
-        //     // // Head Pointer point at Last node
-        //     // *ptrNewHead = forwardPtr;
-        //     // Break
-        //     return 1;
-        // }
     }
     // Set the Head Pointer to Previous Node because the other 2 Nodes are pointing at NULL
     *ptrNewHead = prev_node;

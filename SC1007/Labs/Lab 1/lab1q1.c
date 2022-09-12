@@ -81,7 +81,6 @@ int removeNode(ListNode **ptrHead, int index)
     {
         index -= 1;     // Since After is to be removed
     }
-
     while(index != 0)
     {
         // Validate that User did not try to remove node outside of Linked List
@@ -126,8 +125,6 @@ int removeNode(ListNode **ptrHead, int index)
         // Free the Node that is deleted
         free(after);
     }
-    
-
     printf("After the removal operation, \n");
     return 0;
 }

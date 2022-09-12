@@ -61,9 +61,6 @@ void deleteList(ListNode **ptrHead){
 
 void reverseKNodes(ListNode** head, int K)
 {
-	// Input Validation
-
-
     // Initialize a Dummy Node
 	ListNode *dummy = (ListNode*) malloc(sizeof(ListNode));
 	dummy->next = *head;
@@ -77,123 +74,84 @@ void reverseKNodes(ListNode** head, int K)
 		cursor = cursor->next;
 	}
 
+    // Input Validation
+    if (!(*head))
+    {
+        return;
+    }
+    else if (K > ll_length)
+    {
+        return;
+    } 
+    else if (K == 1)
+    {
+        return;
+    }
+    else if (K==0)
+    {
+        return;
+    }
+    
+
 	// Initialize Pointers for Segments
-	ListNode *segment_prev = dummy;
+	ListNode *segment_prev = NULL;
 	ListNode *segment_next = NULL;
-	ListNode *first_node = dummy;
-	ListNode *last_node = dummy;
+	ListNode *first_node = *head;
+	ListNode *linking_cursor_front = NULL, *linking_cursor_back = NULL;
+    int temp_ll_length = ll_length;
 
-	while (true)
-	{
-		// Find the Last Node of a Segmented List
-		for (int i = 0; i < K; i += 1)
-		{
-			last_node = last_node->next;
-		}
+    // As long as the Linked List can be segmented
+    while (true)
+    {
+        // Reverse within the Segment
+        for (int i = 0; i < K; i += 1)
+        {
+            // Save the Next Node
+            segment_next = first_node->next;
+            // Reverse
+            first_node->next = segment_prev;
+            // Move the Pointers
+            segment_prev = first_node;
+            first_node = segment_next;
+            
+        }
+        // Since Next and First_Node [Current] are Pointing at the same thing.
+        if (segment_next != NULL)
+        {
+            segment_next = segment_next->next;
+        }        
+        // Update the New First Node
+        if (temp_ll_length == ll_length)
+        {
+            // First Reverse
+            // Connect with Rest of Linked List
+            (*head)->next = first_node;
+            // Remember End of Segment
+            linking_cursor_front = (*head);
+            // Remember Start of Next Segment
+            linking_cursor_back = first_node;
+            // Update Head
+            *head = segment_prev;
+        }
+        else
+        {
+            // Connect with Earlier Portion of Linked List
+            linking_cursor_front->next = segment_prev;
+            // Connect Segment with Rest of Linked List
+            linking_cursor_back->next = first_node;
 
-		// Find the Next Node outside of Segment
-		segment_next = last_node->next;
-
-		// Find First Node of a Segmented List
-		first_node = segment_prev->next;
-
-		// Reverse the Segmented List
-		ListNode *prev = NULL;
-		ListNode *next = NULL;
-
-		while (first_node != segment_next)
-		{
-			// Save the Next Node
-			next = first_node->next;
-			// Reverse the Node
-			first_node->next = prev;
-			// Move the Pointers
-			prev = first_node;
-			first_node = next;
-		}
-
-		// Combine the Segmented Linked List
-		(segment_prev->next)->next= segment_next;
-		segment_prev->next = last_node;
-
-		// Break Condition
-		if (last_node == NULL)
-		{
-			break;
-		}
-	}
-
-
+            // Update Linking Pointers
+            linking_cursor_front = linking_cursor_back;
+            linking_cursor_back = linking_cursor_front->next;
+        }
+        
+        // Update Remaining the Number of Nodes
+        temp_ll_length -= K;
+        
+        if (temp_ll_length < K)
+        {
+            break;
+        }
+    }
 }
 
-
-
-/*
-void reverseKNodes(ListNode** head, int K)
-{
-	// Initialize a Pointer to point at First Node
-	ListNode *cursor = *head;
-	// Determine the Length of the Linked List
-	int ll_length = 0;
-	while (cursor != NULL)
-	{
-		ll_length += 1;
-		cursor = cursor->next;
-	}
-
-	// Create 3 Pointers to reverse the Segmented Linked List
-	int num_nodes = ll_length;
-	int first_segment = false;
-	ListNode *pre_node = NULL;
-    ListNode *current_node = *head;
-    ListNode *next_node = NULL;
-	ListNode *original_start = NULL, *original_end = NULL;
-	while (current_node != NULL)
-	{
-		// Check Number of Nodes remaining
-		if (num_nodes >= K)
-		{
-			// Reverse Segment
-			original_start = current_node;
-			for (int i = 0; i < K; i += 1)
-			{
-				// Save the Next List Node
-				next_node = current_node->next;
-				// Reverse the Node
-				current_node->next = pre_node;
-				// Move the remaining pointers forward
-				pre_node = current_node;
-				current_node = current_node->next;
-			}
-			
-			// Connect Segment to Linked List
-			if (first_segment == false)
-			{
-				*head = current_node;
-				original_start->next = next_node;
-				// Save the Node after Segment for Future Connections
-				original_end = next_node;
-
-				first_segment = true;
-				// Break Condition
-				num_nodes -= K;
-			}
-			else
-			{
-				original_end->next = current_node;
-				original_start->next = next_node;
-				original_end = next_node;
-
-				// Break Condition
-				num_nodes -= K;
-			}
-		}
-		// Leave the Remaining Nodes alone and Combine
-		else
-		{
-			return;
-		}
-		
-		return;
-	}
-}*/

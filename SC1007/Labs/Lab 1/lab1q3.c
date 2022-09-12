@@ -108,7 +108,6 @@ int split(ListNode *curr, ListNode **ptrEvenList, ListNode **ptrOddList)
                 headptr = headptr->next;
                 counter += 1;
             }
-            
             else
             {
                 ListNode *newNode = (ListNode*) malloc(sizeof(ListNode));
@@ -122,7 +121,6 @@ int split(ListNode *curr, ListNode **ptrEvenList, ListNode **ptrOddList)
                 counter += 1;
             }
         }
-
         // Odd Indices
         else
         {
@@ -134,7 +132,6 @@ int split(ListNode *curr, ListNode **ptrEvenList, ListNode **ptrOddList)
                 headptr = headptr->next;
                 counter += 1;
             }
-
             else
             {
                 ListNode *newNode = (ListNode*) malloc(sizeof(ListNode));
@@ -149,7 +146,7 @@ int split(ListNode *curr, ListNode **ptrEvenList, ListNode **ptrOddList)
             }
         }
     }
-
+    return 1;
 }
 
 void printLinkedList(ListNode **ptrHead)
