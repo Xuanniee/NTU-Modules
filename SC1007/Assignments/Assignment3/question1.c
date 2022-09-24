@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_N 120
 
@@ -98,58 +99,172 @@ void insert_treeNode(BTNode **node, char item){
 }
 
 void buildTree(BTNode** node, char* preO, char* postO){
+    // Create Pointers and Variables
     char *pre_cursor = preO;
     char *post_cursor = postO;
+    char *LST_cursor = NULL, *RST_cursor = NULL;
     char current_root;
-    BTNode **current_root_node = node;
+    BTNode *current_root_node = *node;
 
-    // Determine the Value of the Root of the Current Subtree
-    if (*node == NULL)
-    {
-        current_root = *preO;
-    }
-    else
-    {
-        current_root = (*node)->id;
-    }
-
-    // Determine Left Child and Right Child Contents
-    while (*pre_cursor != current_root)
-    {
-        pre_cursor += 1;
-    }
-    char left_child = *(pre_cursor + 1);
-    while (*post_cursor != current_root)
-    {
-        post_cursor += 1;
-    }
-    char right_child = *(post_cursor - 1);
-
-    // Recursion Break Condition
-    if ((left_child > right_child) || (current_root > left_child) || (current_root > right_child))
+    if (*preO == '\0')
     {
         return;
     }
 
-    // Recursively add Tree Nodes
+    current_root = *preO;
+
+    // Determine Left Child and Right Child Contents
+    char left_child, right_child;
+    while (*pre_cursor != current_root)
+    {
+        pre_cursor += 1;
+    }
+    // Ensure RHS of Preorder is not Empty
+    if ((preO + 1) != NULL)
+    {
+        left_child = *(pre_cursor + 1);
+    }
+
+    while (*post_cursor != current_root)
+    {
+        post_cursor += 1;
+        // End of Preorder Expression
+        if (*post_cursor == '\0')
+        {
+            break;
+        }
+    }
+    // Ensure that RHS of PreOrder is not Empty
+    if ((preO + 1) != NULL)
+    {
+        right_child = *(post_cursor - 1);
+    }
+
+    // Insert for Current Node
     if (*node == NULL)
     {
         // If Actual Root
         insert_treeNode(node, current_root);
     }
 
-    // Ensure Left and Right Child are not the SAME
-    insert_treeNode(&((*node)->left), left_child);
-    if (left_child != right_child)
+    // Ensure Left and Right Child are not the SAME before Inserting Child Nodes
+    char *check = preO;
+    while(*check)
     {
-        insert_treeNode(&((*node)->right), right_child);
+        if (*check == '\0')
+        {
+            break;
+        }
+        if (left_child == *check)
+        {
+            insert_treeNode(&((*node)->left), left_child);
+        }
+        if ((left_child != right_child) && (right_child == *check))
+        {
+            insert_treeNode(&((*node)->right), right_child);
+        }
+        check += 1;
     }
 
-    // Recursively Call the Function for Left & Right Subtree
-    buildTree(&((*node)->left), preO, postO);
-    if (left_child != right_child)
+    // Recursion Break Condition
+    if(strlen(preO) == 1)
     {
-        buildTree(&((*node)->right), preO, postO);
+        return;
     }
+
+    // Create PreO for LST and PreO for RST
+    // Pointing at LST Root
+    LST_cursor = preO + 1;
+    post_cursor = postO;
+    int RST_elements = 0;
+
+    // Find the LST Root in Post Order
+    while(*post_cursor != *LST_cursor)
+    {
+        post_cursor += 1;
+    }
+
+    // Point at Next Element after LST Root
+    // post_cursor += 1;
+
+    // Find the First Element of RST in PostOrder
+    while (true)
+    {
+        post_cursor += 1;        
+        if ((*post_cursor == current_root) || (*post_cursor == '\0'))
+        {
+            RST_elements += 1;
+            break;
+        }   
+        RST_elements += 1;
+    }
+    // Post_Cursor is pointing at  8 in Post Order
+    post_cursor -= 1;
+    // If RST first Element is the first element of LST
+    if (*post_cursor == *LST_cursor)
+    {
+        *post_cursor = '\0';
+    }
+
+    int LST_elements = 0;
+    // Find the Start of RST Expression in PreOrder
+    pre_cursor = preO;
+    // If the Binary Tree does not have a RST
+    // if (*(pre_cursor + 1) == *post_cursor)
+    // {
+    //     while (*pre_cursor != '\0')
+    //     {
+    //         LST_elements += 1;
+    //     }
+    // }
+    while(true)
+    {
+        pre_cursor += 1;
+        if (*pre_cursor == *post_cursor)
+        {
+            break;
+        }
+        LST_elements += 1;
+    }
+
+    // Create a New PreO String for LST
+    LST_cursor = malloc(LST_elements * sizeof(char) + 1);
+    char *tmp = LST_cursor;
+    char *preorder = preO + 1;
+    // Preorder is also pointing at 8 in Pre ORder
+ 
+    // while(*pre_cursor != *preorder)
+    for (int j = 0; j < LST_elements; j += 1)
+    {
+        // Copy the LST Elements to New String
+        *tmp = *preorder;
+        tmp += 1;
+        preorder += 1;
+        if (*preorder == *pre_cursor)
+        {
+            *tmp = '\0';
+        }
+    }
+
+    // Create a New PreO String for RST
+    RST_cursor = malloc(RST_elements * sizeof(char) + 1);
+    tmp = RST_cursor;
+    for (int i = 0; i < RST_elements; i += 1)
+    {
+        if (i == RST_elements - 1)
+        {
+            *tmp = '\0';
+        }
+        else
+        {
+            *tmp = *pre_cursor;
+        }
+        pre_cursor += 1;
+        tmp += 1;
+    }
+
+    // Recursively Calling BuildTree on LST & RST
+    buildTree(&((*node)->left), LST_cursor, postO);
+    buildTree(&((*node)->right), RST_cursor, postO);
 
 }
