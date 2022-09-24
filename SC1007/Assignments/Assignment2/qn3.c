@@ -18,8 +18,8 @@ void insertNode_AtFront(CDblLinkedList *ptrCDLL, int value);
 void deleteList(CDblLinkedList *ptrCDLL);
 void printList(CDblLinkedList CDLL);
 
-int non_adjacent_pairs(int hmin, CDblListNode *middle_mountains, CDblListNode *target_mountain);
 int numMountainPairs(CDblLinkedList CDLL);
+int non_adjacent_pairs(int hmin, CDblListNode *marker_mountain, CDblListNode *target_mountain, bool clockwise);
 
 int main()
 {
@@ -102,85 +102,107 @@ void deleteList(CDblLinkedList *ptrCDLL){
 
 }
 
-int numMountainPairs(CDblLinkedList CDLL)
-{
+int numMountainPairs(CDblLinkedList CDLL){
+    // Initialize Pointers
+    CDblListNode *marker = CDLL.head;
+    CDblListNode *stop = marker;
+    CDblListNode *target = marker->next;
+
+    // Number of Loops for Distinct Marker
+    int num_of_mountains = CDLL.size;
+    int num_of_pairs = num_of_mountains;
+    int hmin = 0;
+    int placeholder = 0;
+    int loop_counter = 0;
+    bool clockwise = true;
+
     // Input Validation
-    if (CDLL.size == 0)
+    if (num_of_mountains == 1)
     {
         return 0;
     }
-    // Count the Number of Adjacent Mountains
-    int num_visible_pairs = CDLL.size;
-
-    // Determine the Number of Visible Non-Adjacent Mountains
-    CDblListNode *first_mountain = CDLL.head;
-    // Ensure Second Pointer points at non-adjacent mountain
-    CDblListNode *sec_mountain = NULL;
-    CDblListNode *cursor = NULL;
-
-    printList(CDLL);
-
-    // Loop in the Clockwise Direction
-    int hmin = 0;
-    int for_loop_length = 0;
-    
-    for (int j = 0; j < (CDLL.size); j += 1)
+    else if (num_of_mountains == 2)
     {
-        // Ensure Target Mountain is Not Adjacent
-        sec_mountain = (first_mountain->next)->next;
-        // Set Cursor to point at First Node after Marking Mountain (first_mountain)
-        cursor = first_mountain->next;
-   
-        // Loop until the Target Mountain is the first_mountain again
-        while(sec_mountain != first_mountain->pre)
+        return 1;
+    }
+
+    // For Loop to Loop through all the Mountains ONCE
+    for (int i = 0; i < num_of_mountains; i += 1)
+    {
+        // Changing the Second Number of the Pair
+        while (true)
         {
-            // printf("This is the First Mountain: %d      ", first_mountain->item);
-            // printf("This is the Second Mountain: %d\n", sec_mountain->item);
-            // Get the Min of the 2 Mountains
-            if (first_mountain->item > sec_mountain->item)
+            // Break Condition
+            if (target == stop)
             {
-                hmin = sec_mountain->item;
-            }
-            else
-            {
-                hmin = first_mountain->item; 
-            }
-
-            // Check & Add if mountains are non-adjacent and visible
-            if ((first_mountain->next != sec_mountain) && (first_mountain->pre != sec_mountain) && (first_mountain != sec_mountain))
-            {
-                num_visible_pairs += non_adjacent_pairs(hmin, cursor, sec_mountain);
-            }
-
-            // Continue Changing Targets so long as Not Adjacent with first_mountain
-            if (sec_mountain->next != first_mountain->pre)
-            {
-                // Continue comparing with first_mountain; but change the target mountain to a further one
-                sec_mountain = sec_mountain->next;
-            }
-            // Compared all the mountains with CURRENT first_mountain
-            // else if ((sec_mountain->next == first_mountain) && (sec_mountain->pre == first_mountain))
-            // {
-            //     break;
-            // }
-            else
-            {
+                loop_counter += 1;
+                target = marker->next;
                 break;
             }
-        }
-        // Update the first_mountain (marking mountain)
-        first_mountain = first_mountain->next;
+            else if (loop_counter == (num_of_mountains - 1))
+            {
+                loop_counter = 0;
+                break;
+            }
+            // Check if Adjacent
+            else if ((target == marker->next) || (target == marker->pre) || (target == marker))
+            {
+                // Move Second Number of Pair if Adjacent
+                target = target->next;
+                continue;
+            }
 
+            // Determine Minimum Height
+            if (marker->item > target->item)
+            {
+                hmin = target->item;
+            }
+            else
+            {
+                hmin = marker->item;
+            }
+
+            // Check if Visible in Clockwise Direction
+            clockwise = true;
+            placeholder = non_adjacent_pairs(hmin, marker, target, clockwise);
+
+            // Check if Visible in AntiClockwise Direction
+            if (placeholder == 0)
+            {
+                clockwise = false;
+                placeholder = non_adjacent_pairs(hmin, marker, target, clockwise);
+            }
+            
+            // Add to Pairs
+            num_of_pairs += placeholder;
+            // Reset Placeholder
+            placeholder = 0;
+
+            // Move the Target to the Next Mountain
+            target = target->next;
+        }
+        
+        // Move the Marker Mountain
+        marker = marker->next;
     }
-    
-    return num_visible_pairs;
+    return num_of_pairs;
 }
 
-int non_adjacent_pairs(int hmin, CDblListNode *middle_mountains, CDblListNode *target_mountain)
+
+int non_adjacent_pairs(int hmin, CDblListNode *marker_mountain, CDblListNode *target_mountain, bool clockwise)
 {
     // Check if there are non-adjacent visible pairs
-    CDblListNode *cursor = middle_mountains;
+    CDblListNode *cursor = NULL;
+    if (clockwise == true)
+    {
+        cursor = marker_mountain->next;
+    }
+    else if (clockwise == false)
+    {
+        cursor = marker_mountain->pre;
+    }
     int non_adjacent_visible_pairs = 0;
+
     while (true)
     {
         // Checking if Middle Mountains' Heights are Greater than Hmin
@@ -189,14 +211,20 @@ int non_adjacent_pairs(int hmin, CDblListNode *middle_mountains, CDblListNode *t
             return 0;
         }
         // Move to Next Mountain
-        cursor = cursor->next;
+        if (clockwise == true)
+        {
+            cursor = cursor->next;
+        }
+        else
+        {
+            cursor = cursor->pre;
+        }
         
         if (cursor == target_mountain)
         {
             break;
         }
     }
-    printf("These are the Mountains (%d, %d)\n", (middle_mountains->pre)->item, target_mountain->item);
     non_adjacent_visible_pairs += 1;
     return non_adjacent_visible_pairs;
 }
