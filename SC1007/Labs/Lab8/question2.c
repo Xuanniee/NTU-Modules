@@ -33,32 +33,51 @@ int cr_top_down_dp(int *p, int n)
     // Top Down is to Store the Values if not Computed 
     
     // Base Case
-    if (n == 0)
+    if (n <= 0)
     {
         return 0;
     }
 
     // Recursive Case
-    int current_max = 1;
-    for (int i = 2; i <= n; i += 1)
+    int current_max = -1;
+    for (int i = 1; i <= n; i += 1)
     {
-        // Check if Value is Existing
-        if (r[i] == -1)
+        // Calculate the Price of the Rods to be sold by Cutting i-cm out
+        int current_value = p[i] + cr_top_down_dp(p, n-i);
+
+        if (current_value > current_max)
         {
-            // Value not Computed yet
-            r[i] = cr_top_down_dp(p, n-1);
+            current_max = current_value;
         }
-        if (r[9])
+        
     }
+
+    return current_max;
     
 }
 
 int cr_bottom_up_dp(int *p, int n)
 {
-    //write your code here
+    // Bottom-Up stores all of the Subproblem Solutions before returning at the end.
+    int placeholder = -1;
+    for (int i = 1; i <= n; i += 1)
+    {
+        r[i] = p[i] + cr_bottom_up_dp(p, n-i);
+    }
+
+    for (int j = 1; j < n; j += 1)
+    {
+        if (r[j] > placeholder)
+        {
+            placeholder = r[j];
+        }
+    }
+
+    return placeholder;
+    
 }
  
-void main ()
+int main ()
 {
     int n;      //length of  rod
     int function;
@@ -102,4 +121,6 @@ void main ()
         printf("Choose a function (1 for recursive, 2 for top-down DP, 3 for bottom-up DP, 0 to stop): \n");
         scanf("%d",&function);
     }
+
+    return 0;
 }
