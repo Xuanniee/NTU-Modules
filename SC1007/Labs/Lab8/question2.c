@@ -30,7 +30,7 @@ int cr_recursive(int *p, int n)
 
 int cr_top_down_dp(int *p, int n)
 {
-    // Top Down is to Store the Values if not Computed 
+    // Top Down is to compute when we need the results and store them
     
     // Base Case
     if (n <= 0)
@@ -52,29 +52,36 @@ int cr_top_down_dp(int *p, int n)
         
     }
 
+    // Write to Memroy
+    r[n] = current_max;
     return current_max;
     
 }
 
 int cr_bottom_up_dp(int *p, int n)
 {
-    // Bottom-Up stores all of the Subproblem Solutions before returning at the end.
-    int placeholder = -1;
+    // Bottom-Up stores all of the solutions using Tabulation
+    
+    // First Array Value
+    r[0] = 0;
+    
+    int placeholder = 0;
+    // Iterate through the Rods of Various Lengths to fill the table
     for (int i = 1; i <= n; i += 1)
     {
-        r[i] = p[i] + cr_bottom_up_dp(p, n-i);
-    }
-
-    for (int j = 1; j < n; j += 1)
-    {
-        if (r[j] > placeholder)
+        // Iterate through all the possibilities of cutting the rods into various lengths
+        for (int j = 1; j <= i; j += 1)
         {
-            placeholder = r[j];
+            // Calculating the Value of Cutting Rod into length i and max value of remaining pieces
+            placeholder = p[j] + r[i-j]; // r[x] is the Max Value of Remaining Length
+            if (placeholder > r[i])
+            {
+                r[i] = placeholder;
+            }
         }
     }
 
-    return placeholder;
-    
+    return r[n];    
 }
  
 int main ()
@@ -88,7 +95,6 @@ int main ()
     
     n = sizeof(price_list) / sizeof(int) - 1;
     p = price_list;
-    printf("%d", n);
     
     
     //allocate the memory array

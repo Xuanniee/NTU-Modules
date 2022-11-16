@@ -80,6 +80,52 @@ int main()
     return 0;
 }
 
+// void DFS_I (Graph g, int v)
+// {
+//     int numVertices = g.V;
+//     int *visited = g.visited;
+//     int **adj_matrix = g.matrix;
+
+//     // Create a Stack
+//     Stack *vertexStack = malloc(sizeof(Stack));
+//     vertexStack->size = 0;
+//     vertexStack->head = NULL;
+
+//     // Push the Desired Node into Stack and Visit
+//     push(vertexStack, v);
+//     visited[v-1] = 1;
+//     printf("%d ", v);
+
+//     // While Stack isn't Empty
+//     while (isEmptyStack(*vertexStack) != 1)
+//     {
+//         int currentVertex = peek(*vertexStack);
+//         int counter = 0;
+//         for (int i = 0; i < numVertices; i += 1)
+//         {
+//             // Adjacent & Not Visited
+//             if ((adj_matrix[currentVertex-1][i] == 1) && (visited[i] != 1))
+//             {
+//                 // Visit and Push into Stack
+//                 visited[i] = 1;
+//                 push(vertexStack, (i+1));
+//                 printf("%d ", i+1);
+//             }
+//             else
+//             {
+//                 counter += 1;
+//             }
+//         }
+
+//         if (counter == numVertices)
+//         {
+//             pop(vertexStack);
+//         }
+
+//     }
+//     printf("\n");
+// }
+
 void DFS_I (Graph g, int v)
 {
     // Visit the Neighbouring Vertices in Ascending Order using Depth First Search

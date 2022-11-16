@@ -80,6 +80,45 @@ int main()
     return 0;
 }
 
+// void BFS(Graph g, int v){
+//     // BFS Uses a Queue
+//     int numVertices = g.V;
+//     int **adj_matrix = g.matrix;
+//     int *visitedArray = g.visited;
+
+//     // Create a Queue
+//     Queue *vertexQueue = (Queue*) malloc(sizeof(Queue));
+//     vertexQueue->size = 0;
+//     vertexQueue->head = NULL;
+//     vertexQueue->tail = NULL;
+
+//     enqueue(vertexQueue, v);
+//     visitedArray[v-1] = 1;
+//     printf("%d ", v);
+
+//     while(isEmptyQueue(*vertexQueue) != 1)
+//     {
+//         // While Queue is Not Empty, Add the Neighbours of Vertex into the Queue
+//         int currentVertex = getFront(*vertexQueue);
+//         for (int i = 0; i < numVertices; i += 1)
+//         {
+//             // Not Visited and Adjacent
+//             if ((adj_matrix[currentVertex-1][i] == 1) && (visitedArray[i] == 0))
+//             {
+//                 // Visit the Node and Enqueue the Neighbours
+//                 visitedArray[i] = 1;
+//                 enqueue(vertexQueue, (i+1));
+//                 printf("%d ", i+1);
+//             }
+//         }
+//         // If Visited all Neighbours
+//         dequeue(vertexQueue);
+        
+//     }
+//     printf("\n");
+
+// }
+
 void BFS(Graph g, int v)
 {
     // Create a Queue to keep track of Traversal Order
