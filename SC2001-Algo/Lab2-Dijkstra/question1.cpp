@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+
+using namespace std::chrono;
 
 // Define the Number of Vertices
 #define V 9
@@ -34,7 +37,12 @@ int main()
                         { 8, 11, 0, 0, 0, 0, 1, 0, 7 },
                         { 0, 0, 2, 0, 0, 0, 6, 7, 0 } };
 
+    auto startTime = high_resolution_clock::now();
     dijkstra(graph, 0);
+    auto endTime = high_resolution_clock::now();
+
+    auto timeTaken = duration_cast<microseconds>(endTime - startTime);
+    std::cout << "Time taken for Dijkstra using Arrays as Priority Queue: " << timeTaken.count() << " microseconds" << std::endl;
 
     return 0;
 }
@@ -94,21 +102,32 @@ void dijkstra(int graph[V][V], int srcNode)
     printSolution(shortestCostArray);
 }
 
-// Insert a new Element into PQ
+/**
+ *  Helper Functions for Implementing an Array as a Priority Queue
+ */
+
+/**
+ * @brief Enqueues a Node to the End of the Array
+ * 
+ * @param nodeValue 
+ * @param shortestPathCost 
+ */
 void enqueue(int nodeValue, int shortestPathCost)
 {
     // Increase the Size of the Queue by Moving the PQ Pointer
     sizeQueue += 1;    // If Empty, will cause it to be index 0 for first iteration
 
     // Insert the Element into the Queue
-
     priorityQueue[sizeQueue].nodeValue = nodeValue;
     priorityQueue[sizeQueue].shortestPathCost = shortestPathCost;
-
-    // Sort
 }
 
-// Function to peek at the element with the highest priority
+/**
+ * @brief Helper Function to retrieve NodeValue with the Highest Priority
+ * 
+ * @param shortestCostArray 
+ * @return int 
+ */
 int peek(int shortestCostArray[])
 {
     // Set HP to the lowest possible value so that it can be replaced by any value that is higher
@@ -132,7 +151,12 @@ int peek(int shortestCostArray[])
     return priorityQueue[index].nodeValue;
 }
 
-// Function to remove the element with the highest priority
+/**
+ * @brief Helper Function to remove a specified Node Value
+ * 
+ * @param shortestCostArray 
+ * @param targetNode 
+ */
 void dequeue(int shortestCostArray[], int targetNode)
 {
     // Find the Element with the Highest Priority
@@ -158,8 +182,11 @@ void dequeue(int shortestCostArray[], int targetNode)
     sizeQueue -= 1;
 }
 
-// A utility function to print the constructed distance
-// array
+/**
+ * @brief Utility Function to print out the Shortest Distances from the Source Vertex to each Node
+ * 
+ * @param dist 
+ */
 void printSolution(int dist[])
 {
     std::cout << "Vertex \t Distance from Source" << std::endl;
