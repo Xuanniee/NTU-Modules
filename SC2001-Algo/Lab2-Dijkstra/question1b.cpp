@@ -49,6 +49,10 @@ MinHeapNode* newMinHeapNode(int nodeValue, int dist);
 void dijkstra(Graph* graph, int srcNode);
 
 int main() {
+    /**
+     * @brief Issue seems to be with my minHeapify Function not working as intended since the Visited Nodes order is wrong
+     * 
+     */
     Graph* graph = createGraph(V);
     addEdge(graph, 0, 1, 4);
     addEdge(graph, 0, 7, 8);
@@ -98,13 +102,16 @@ void dijkstra(Graph* graph, int srcNode)
         minimumHeap->array[i] = newMinHeapNode(i, shortestCostArray[i]);
         minimumHeap->size++;
     }
+  
     // Ensure it is a minHeap
     minHeapify(minimumHeap, 0);
 
     // Extracting the Node with the lowest costs
     while (minimumHeap->size != 0) {
-        // Remove Current Node from Queue
+        // Remove the Node with the Lowest Distance
         MinHeapNode* currentNode = HeapExtractMinNode(minimumHeap);
+        // std::cout << "Visited Node: " << currentNode->nodeValue << std::endl;
+
         // Include it in our Solution
         solutionArray[currentNode->nodeValue] = 1;
         minimumHeap->size -= 1;
@@ -112,13 +119,16 @@ void dijkstra(Graph* graph, int srcNode)
         // Updating Adjacent Nodes to Current Node to reflect new costs
         AdjListNode* cursor = graph->array[currentNode->nodeValue].head;
         while (cursor != NULL) {
+            int adjacentNode = cursor->dest;
             // If Adjacent Nodes are not in the solution path and the cost of the old path is higher, replace with new path
-            if (solutionArray[cursor->dest] != 1 && shortestCostArray[cursor->dest] > shortestCostArray[currentNode->nodeValue] + cursor->weight){
-                shortestCostArray[cursor->dest] = shortestCostArray[currentNode->nodeValue] + cursor->weight;
-                predecessorArray[cursor->dest] = currentNode->nodeValue;
+            if (solutionArray[adjacentNode] != 1 && shortestCostArray[adjacentNode] > shortestCostArray[currentNode->nodeValue] + cursor->weight){
+                // Update with new & shorter cost path
+                shortestCostArray[adjacentNode] = shortestCostArray[currentNode->nodeValue] + cursor->weight;
+                predecessorArray[adjacentNode] = currentNode->nodeValue;
 
-                // Update the Adjacent Node (INDEX OF THE HEAP TODO)
+                // Update the Adjacent Node Cost within the Heap
                 HeapDecreaseKey(minimumHeap, cursor->dest, shortestCostArray[cursor->dest]);
+                minHeapify(minimumHeap, 0);
             }
             cursor = cursor->next;
         }
@@ -178,9 +188,10 @@ void minHeapify(MinHeap* minimumHeap, int parentIndex) {
     int rightChildIndex = (parentIndex * 2) + 1;
 
     // Ensure that Left Child is not a Leaf and Determine if Left is smaller than Parent
-    if ((leftChildIndex <= minimumHeap->size) && minimumHeap->array[leftChildIndex]->dist < minimumHeap->array[parentIndex]->dist){
+    if ((leftChildIndex <= minimumHeap->size) && (minimumHeap->array[leftChildIndex]->dist < minimumHeap->array[parentIndex]->dist)){
         smallestIndex = leftChildIndex;
     }
+    // Repeat for Right Child
     if ((rightChildIndex <= minimumHeap->size) && (minimumHeap->array[rightChildIndex]->dist < minimumHeap->array[parentIndex]->dist)){
         smallestIndex = rightChildIndex;
     }
@@ -188,10 +199,10 @@ void minHeapify(MinHeap* minimumHeap, int parentIndex) {
     // If Parent is not the Smallest
     if (smallestIndex != parentIndex){
         // Swap the Nodes
-        MinHeapNode* node1 = minimumHeap->array[parentIndex];
-        MinHeapNode* node2 = minimumHeap->array[smallestIndex];
-        swapMinHeapNode(&node1, &node2);
-        // Fix the SubHeap
+        // MinHeapNode* node1 = minimumHeap->array[parentIndex];
+        // MinHeapNode* node2 = minimumHeap->array[smallestIndex];
+        swapMinHeapNode(&(minimumHeap->array[parentIndex]), &(minimumHeap->array[smallestIndex]));
+        // Fix the SubHeap at where the Parent Node is at after the Swap
         minHeapify(minimumHeap, smallestIndex);
     }
 }
@@ -207,12 +218,13 @@ MinHeapNode* HeapExtractMinNode(MinHeap* minimumHeap){
         throw std::invalid_argument("Heap Underflow");
     }
 
+    // Minimum Node in a Min Heap is the Root, i.e. the first element
     MinHeapNode* minimumNode = minimumHeap->array[0];
-    // Shift Last Node to the Start of the Array
+    // Shift Last Node to the Start of the Array to remove the Min
     minimumHeap->array[0] = minimumHeap->array[minimumHeap->size - 1];
     // Heapify the Heap so that Minimum Heap Property is preserved
     minHeapify(minimumHeap, 0);
-
+    
     return minimumNode;
 }
 \
@@ -238,9 +250,9 @@ void HeapDecreaseKey(MinHeap* minimumHeap, int index, int newKeyDistance){
     // Ensure Heap Property is not violated
     int parentIndex = floor(index / 2);
     while (index > 1 && minimumHeap->array[parentIndex]->dist < minimumHeap->array[index]->dist) {
-        MinHeapNode* node1 = minimumHeap->array[parentIndex];
-        MinHeapNode* node2 = minimumHeap->array[index];
-        swapMinHeapNode(&node1, &node2);
+        // MinHeapNode* node1 = minimumHeap->array[parentIndex];
+        // MinHeapNode* node2 = minimumHeap->array[index];
+        swapMinHeapNode(&(minimumHeap->array[parentIndex]), &(minimumHeap->array[index]));
         index = parentIndex;
         parentIndex = floor(index / 2);
     }
