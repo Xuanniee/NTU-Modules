@@ -1,8 +1,15 @@
+#include <Python.h>
 #include <iostream>
-#include <cmath>
+#include <chrono>
+#include <vector>
 
-#define V 9
+#include "matplotlibcpp.h"
+
+namespace plt = matplotlibcpp;
+using namespace std::chrono;
+
 #define MYINFINITY 9999999
+#define ITERATIONS 15
 
 // Structures for Minimising Heap
 typedef struct minHeapNode{
@@ -38,7 +45,7 @@ typedef struct graph
 
 void printArr(int dist[], int n);
 void addEdge(Graph* graph, int src, int dest, int weight);
-Graph* createGraph(int numVertices);
+Graph* createGraph(int numVertices, int numEdges);
 AdjListNode* newAdjListNode(int dest, int weight);
 void HeapDecreaseKey(MinHeap* minimumHeap, int index, int newKeyDistance);
 MinHeapNode* HeapExtractMinNode(MinHeap* minimumHeap);
@@ -46,39 +53,88 @@ void minHeapify(MinHeap* minimumHeap, int parentIndex);
 void swapMinHeapNode(MinHeapNode** node1, MinHeapNode** node2);
 MinHeap* BuildMinHeap(int capacity);
 MinHeapNode* newMinHeapNode(int nodeValue, int dist);
-void dijkstra(Graph* graph, int srcNode);
+void dijkstra(Graph* graph, int srcNode, int V);
 
 int main() {
-    /**
-     * @brief Issue seems to be with my minHeapify Function not working as intended since the Visited Nodes order is wrong
-     * 
-     */
-    Graph* graph = createGraph(V);
-    addEdge(graph, 0, 1, 4);
-    addEdge(graph, 0, 7, 8);
-    addEdge(graph, 1, 2, 8);
-    addEdge(graph, 1, 7, 11);
-    addEdge(graph, 2, 3, 7);
-    addEdge(graph, 2, 8, 2);
-    addEdge(graph, 2, 5, 4);
-    addEdge(graph, 3, 4, 9);
-    addEdge(graph, 3, 5, 14);
-    addEdge(graph, 4, 5, 10);
-    addEdge(graph, 5, 6, 2);
-    addEdge(graph, 6, 7, 1);
-    addEdge(graph, 6, 8, 6);
-    addEdge(graph, 7, 8, 7);
- 
-    dijkstra(graph, 0);
+    // Initial Variables
+    int numVertices = 10;
+    int numEdges = numVertices;
+    std::cout << "BEFORE ARRAYS";
+    // Arrays for Plotting the Graphs for Complexity Analysis
+    std::vector<int> timesArray1(ITERATIONS);
+    std::vector<int> timesArray2(ITERATIONS);
+    std::vector<int> numVerticesArray(ITERATIONS);
+    std::vector<int> numEdgesArray(ITERATIONS);
+    std::cout << "PASSED ARRAYS";
+
+    // Varying the Number of Vertices
+    for (int i{0}; i < ITERATIONS; i += 1){
+        // Im not sure what is the number of edges I should set
+        Graph* graph = createGraph(numVertices, numEdges);
+
+        auto startTime = high_resolution_clock::now();
+        dijkstra(graph, 0, numVertices);
+        auto endTime = high_resolution_clock::now();
+        auto timeTaken = duration_cast<microseconds>(endTime - startTime);
+
+        // Recording Values
+        timesArray1.at(i) = timeTaken.count();
+        numVerticesArray.at(i) = numVertices;
+
+        numVertices += 25;
+        numEdges = numVertices;
+    }
+    
+    // Varying the Number of Edges
+    numVertices = 15;
+    numEdges = 7;
+    for (int i{0}; i < ITERATIONS; i += 1){
+        // Im not sure what is the number of edges I should set
+        Graph* graph = createGraph(numVertices, numEdges);
+
+        auto startTime = high_resolution_clock::now();
+        dijkstra(graph, 0, numVertices);
+        auto endTime = high_resolution_clock::now();
+        auto timeTaken = duration_cast<microseconds>(endTime - startTime);
+
+        // Recording Values
+        timesArray2.at(i) = timeTaken.count();
+        numEdgesArray.at(i) = numEdges;
+
+        numEdges += 1;
+    }
+
+    // Plotting the First Graph
+    plt::plot(timesArray1, numVerticesArray);
+    plt::xlabel("Number of Vertices");
+    plt::ylabel("Time Taken by Dijkstra Algorithm");
+    plt::title("Graph of Time against Number of Vertices [Heaps]");
+    // Save the image (file format is determined by the extension)
+    plt::save("./dijkstraHeapVaryVertices.png");
+
+    // Plotting the Second Graph
+    plt::plot(timesArray2, numEdgesArray);
+    plt::xlabel("Number of Edges");
+    plt::ylabel("Time Taken by Dijkstra Algorithm");
+    plt::title("Graph of Time against Number of Edges [Heaps]");
+    plt::save("./dijkstraHeapVeryEdges.png");
+
+    // auto startTime = high_resolution_clock::now();
+    // dijkstra(graph, 0);
+    // auto endTime = high_resolution_clock::now();
+
+    // auto timeTaken = duration_cast<microseconds>(endTime - startTime);
+    // std::cout << "Time taken for Dijkstra using Minimising Heaps as Priority Queue: " << timeTaken.count() << " microseconds" << std::endl;
     return 0;
 }
 
-void dijkstra(Graph* graph, int srcNode)
+void dijkstra(Graph* graph, int srcNode, int V)
 {
     // Definition of Solution, Predecessor, and Shortest Paths Arrays
-    int solutionArray[V] {};
-    int predecessorArray[V] {};
-    int shortestCostArray[V] {};
+    int* solutionArray = (int*) malloc(sizeof(int)*V);
+    int* predecessorArray = (int*) malloc(sizeof(int)*V);
+    int* shortestCostArray = (int*) malloc(sizeof(int)*V);
+
     // Initialisation of Arrays
     for (int i{0}; i < V; i += 1)
     {
@@ -119,6 +175,7 @@ void dijkstra(Graph* graph, int srcNode)
         // Updating Adjacent Nodes to Current Node to reflect new costs
         AdjListNode* cursor = graph->array[currentNode->nodeValue].head;
         while (cursor != NULL) {
+            std::cout << "STUCK";
             int adjacentNode = cursor->dest;
             // If Adjacent Nodes are not in the solution path and the cost of the old path is higher, replace with new path
             if (solutionArray[adjacentNode] != 1 && shortestCostArray[adjacentNode] > shortestCostArray[currentNode->nodeValue] + cursor->weight){
@@ -268,7 +325,7 @@ AdjListNode* newAdjListNode(int dest, int weight){
     return newNode;
 }
 
-Graph* createGraph(int numVertices)
+Graph* createGraph(int numVertices, int numEdges)
 {
     Graph* graph = (Graph*) malloc(sizeof(Graph));
     graph->numVertices = numVertices;
@@ -279,9 +336,39 @@ Graph* createGraph(int numVertices)
  
     // Initialize each adjacency list
     // as empty by making head as NULL
-    for (int i = 0; i < V; ++i)
+    for (int i = 0; i < numVertices; ++i)
         graph->array[i].head = NULL;
- 
+    
+    int counter{0};
+    int src{0};
+    int dest{0};
+    int weight{0};
+
+    while(counter != numEdges) {
+        // Generates Random Vertex from 0 to numVertices - 1
+        src = rand() % numVertices;
+        do{
+            dest = rand() % numVertices;
+        }while (src != dest);
+        // Weights from 0 to 19
+        weight = rand() % 20;
+        addEdge(graph, src, dest, weight);
+    }
+    // addEdge(graph, 0, 1, 4);
+    // addEdge(graph, 0, 7, 8);
+    // addEdge(graph, 1, 2, 8);
+    // addEdge(graph, 1, 7, 11);
+    // addEdge(graph, 2, 3, 7);
+    // addEdge(graph, 2, 8, 2);
+    // addEdge(graph, 2, 5, 4);
+    // addEdge(graph, 3, 4, 9);
+    // addEdge(graph, 3, 5, 14);
+    // addEdge(graph, 4, 5, 10);
+    // addEdge(graph, 5, 6, 2);
+    // addEdge(graph, 6, 7, 1);
+    // addEdge(graph, 6, 8, 6);
+    // addEdge(graph, 7, 8, 7);
+
     return graph;
 }
 
