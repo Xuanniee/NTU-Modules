@@ -58,14 +58,13 @@ void dijkstra(Graph* graph, int srcNode, int V);
 int main() {
     // Initial Variables
     int numVertices = 10;
-    int numEdges = numVertices;
-    std::cout << "BEFORE ARRAYS";
+    int numEdges = numVertices + 10;
+
     // Arrays for Plotting the Graphs for Complexity Analysis
     std::vector<int> timesArray1(ITERATIONS);
     std::vector<int> timesArray2(ITERATIONS);
     std::vector<int> numVerticesArray(ITERATIONS);
     std::vector<int> numEdgesArray(ITERATIONS);
-    std::cout << "PASSED ARRAYS";
 
     // Varying the Number of Vertices
     for (int i{0}; i < ITERATIONS; i += 1){
@@ -175,7 +174,6 @@ void dijkstra(Graph* graph, int srcNode, int V)
         // Updating Adjacent Nodes to Current Node to reflect new costs
         AdjListNode* cursor = graph->array[currentNode->nodeValue].head;
         while (cursor != NULL) {
-            std::cout << "STUCK";
             int adjacentNode = cursor->dest;
             // If Adjacent Nodes are not in the solution path and the cost of the old path is higher, replace with new path
             if (solutionArray[adjacentNode] != 1 && shortestCostArray[adjacentNode] > shortestCostArray[currentNode->nodeValue] + cursor->weight){
@@ -349,10 +347,13 @@ Graph* createGraph(int numVertices, int numEdges)
         src = rand() % numVertices;
         do{
             dest = rand() % numVertices;
-        }while (src != dest);
+        }while (src == dest);
         // Weights from 0 to 19
         weight = rand() % 20;
         addEdge(graph, src, dest, weight);
+        // std::cout << "VERTEX " << src << " TO " << dest << " WITH " << weight <<std::endl;
+
+        counter += 1;
     }
     // addEdge(graph, 0, 1, 4);
     // addEdge(graph, 0, 7, 8);
