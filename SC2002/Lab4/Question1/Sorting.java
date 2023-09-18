@@ -39,5 +39,26 @@ public class Sorting
 				list[position] = key;
 		}
 	}
+
+	//-----------------------------------------------------------------
+	// Sorts the specified array of objects using the insertion
+	// sort algorithm in descending order
+	//-----------------------------------------------------------------
+	public static void insertionSortDesc (Comparable[] list)
+	{
+		for (int index = 1; index < list.length; index++)
+		{
+			Comparable key = list[index];
+			int position = index;
+
+			// Shift larger values to the left to make it descending
+			while (position > 0 && key.compareTo(list[position-1]) > 0)		// 0 iif equal, < 0 if key has less chars than other string
+			{
+				list[position] = list[position-1];
+				position--;
+			}
+				list[position] = key;
+		}
+	}
 }
 //

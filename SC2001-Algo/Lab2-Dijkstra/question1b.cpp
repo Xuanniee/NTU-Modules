@@ -80,13 +80,13 @@ int main() {
         timesArray1.at(i) = timeTaken.count();
         numVerticesArray.at(i) = numVertices;
 
-        numVertices += 25;
-        numEdges = numVertices;
+        numVertices += 30;
+        numEdges = numVertices + 15;
     }
     
     // Varying the Number of Edges
-    numVertices = 15;
-    numEdges = 7;
+    numVertices = 50;
+    numEdges = 5;
     for (int i{0}; i < ITERATIONS; i += 1){
         // Im not sure what is the number of edges I should set
         Graph* graph = createGraph(numVertices, numEdges);
@@ -100,10 +100,11 @@ int main() {
         timesArray2.at(i) = timeTaken.count();
         numEdgesArray.at(i) = numEdges;
 
-        numEdges += 1;
+        numEdges += 3;
     }
 
     // Plotting the First Graph
+    plt::figure(1);
     plt::plot(timesArray1, numVerticesArray);
     plt::xlabel("Number of Vertices");
     plt::ylabel("Time Taken by Dijkstra Algorithm");
@@ -112,6 +113,7 @@ int main() {
     plt::save("./dijkstraHeapVaryVertices.png");
 
     // Plotting the Second Graph
+    plt::figure(2);
     plt::plot(timesArray2, numEdgesArray);
     plt::xlabel("Number of Edges");
     plt::ylabel("Time Taken by Dijkstra Algorithm");

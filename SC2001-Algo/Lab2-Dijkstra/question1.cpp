@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <ctime>
 
 #include "matplotlibcpp.h"
 
@@ -12,7 +13,7 @@ using namespace std::chrono;
 // #define V 500
 #define INFINITYXY 9999999
 #define MAXWEIGHT 10
-#define ITERATIONS 20
+#define ITERATIONS 50
 
 // Custom Data Types
 struct PriorityQueueItem
@@ -76,17 +77,20 @@ int main()
         int **adjMatrix = createGraph(numVertices, -1);
         
         auto startTime = high_resolution_clock::now();
+        // clock_t start = clock();
         dijkstra(adjMatrix, 0, numVertices);
         auto endTime = high_resolution_clock::now();
+        // clock_t end = clock();
         
         auto timeTaken = duration_cast<microseconds>(endTime - startTime);
-        // std::cout << "Time taken for Dijkstra using Arrays as Priority Queue: " << timeTaken.count() << " microseconds" << std::endl;
+        // double cpuTime = (double) (end-start) / CLOCKS_PER_SEC;
         
         // Export to CSV
         timesArray1.at(i) = timeTaken.count();
+        // timesArray1.at(i) = cpuTime;
         numVerticesArray.at(i) = numVertices;
     
-        numVertices += 10;
+        numVertices += 20;
     }
 
     numVertices = 10;
@@ -111,10 +115,11 @@ int main()
 
     for (int i{0}; i < ITERATIONS; i += 1){
         std::cout << "Time for Array: " << timesArray1[i] << " microseconds" << std::endl;
-        std::cout << "Time for Heap: " << timesArray2[i] << " microseconds" << std::endl;
+        std::cout << "Time for Array Edge: " << timesArray2[i] << " microseconds" << std::endl;
     }
 
     // Plotting the First Graph
+    plt::figure(1);
     plt::plot(timesArray1, numVerticesArray);
     plt::xlabel("Number of Vertices");
     plt::ylabel("Time Taken by Dijkstra Algorithm");
@@ -123,6 +128,7 @@ int main()
     plt::save("./dijkstraArrayVaryVertices.png");
 
     // Plotting the Second Graph
+    plt::figure(2);
     plt::plot(timesArray2, numEdgesArray);
     plt::xlabel("Number of Edges");
     plt::ylabel("Time Taken by Dijkstra Algorithm");

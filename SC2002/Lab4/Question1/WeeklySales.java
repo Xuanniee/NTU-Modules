@@ -19,7 +19,7 @@ public class WeeklySales
 		salesStaff[8] = new SalePerson("Jim", "Doe", 2850);
 		salesStaff[9] = new SalePerson("Walt", "Smith", 3000);
 
-		Sorting.insertionSort(salesStaff);
+		Sorting.insertionSortDesc(salesStaff);
 
 		System.out.println ("\nRanking of Sales for the Week\n");
 
